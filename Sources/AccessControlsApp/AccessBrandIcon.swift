@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct AccessBrandIcon: View {
@@ -5,68 +6,59 @@ struct AccessBrandIcon: View {
     var showsShadow = false
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "#FFE58E"),
-                            Color(hex: "#FF9D52"),
-                            Color(hex: "#FF5E73")
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+        Image(nsImage: Self.statusImage)
+            .resizable()
+            .renderingMode(.original)
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .fixedSize()
+            .shadow(color: .black.opacity(showsShadow ? 0.28 : 0), radius: size * 0.18, y: size * 0.09)
+            .accessibilityHidden(true)
+    }
 
-            RoundedRectangle(cornerRadius: size * 0.24, style: .continuous)
-                .fill(
-                    RadialGradient(
-                        colors: [.white.opacity(0.42), .clear],
-                        center: .topLeading,
-                        startRadius: 1,
-                        endRadius: size * 0.82
-                    )
-                )
-
-            AccessRouteGlyph()
-                .stroke(
-                    Color(hex: "#07100D"),
-                    style: StrokeStyle(
-                        lineWidth: max(2.4, size * 0.12),
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
-                .frame(width: size * 0.58, height: size * 0.48)
-                .offset(x: size * 0.01, y: size * 0.01)
+    static func installApplicationIcon() {
+        if let iconURL = Bundle.main.url(forResource: "AccessControls", withExtension: "icns"),
+           let icon = NSImage(contentsOf: iconURL) {
+            NSApplication.shared.applicationIconImage = icon
+            return
         }
-        .frame(width: size, height: size)
-        .shadow(color: .black.opacity(showsShadow ? 0.28 : 0), radius: size * 0.18, y: size * 0.09)
-        .accessibilityHidden(true)
+
+        NSApplication.shared.applicationIconImage = statusImage
     }
-}
 
-private struct AccessRouteGlyph: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
+    private static let statusImage: NSImage = {
+        let url = Bundle.main.url(forResource: "AccessControlsStatusIcon", withExtension: "png")
+            ?? Bundle.module.url(forResource: "AccessControlsStatusIcon", withExtension: "png")
 
-        let start = CGPoint(x: rect.minX + rect.width * 0.06, y: rect.minY + rect.height * 0.70)
-        let firstPeak = CGPoint(x: rect.minX + rect.width * 0.31, y: rect.minY + rect.height * 0.36)
-        let valley = CGPoint(x: rect.minX + rect.width * 0.52, y: rect.minY + rect.height * 0.59)
-        let arrowTip = CGPoint(x: rect.minX + rect.width * 0.92, y: rect.minY + rect.height * 0.12)
-        let arrowLeft = CGPoint(x: rect.minX + rect.width * 0.64, y: rect.minY + rect.height * 0.12)
-        let arrowDown = CGPoint(x: rect.minX + rect.width * 0.92, y: rect.minY + rect.height * 0.42)
+        guard let url, let image = NSImage(contentsOf: url) else {
+            return fallbackImage
+        }
 
-        path.move(to: start)
-        path.addLine(to: firstPeak)
-        path.addLine(to: valley)
-        path.addLine(to: arrowTip)
+        image.isTemplate = false
+        return image
+    }()
 
-        path.move(to: arrowLeft)
-        path.addLine(to: arrowTip)
-        path.addLine(to: arrowDown)
-
-        return path
-    }
+    private static let fallbackImage: NSImage = {
+        let image = NSImage(size: NSSize(width: 64, height: 64))
+        image.lockFocus()
+        NSColor.systemOrange.setFill()
+        NSBezierPath(roundedRect: NSRect(x: 4, y: 4, width: 56, height: 56), xRadius: 14, yRadius: 14).fill()
+        NSColor.black.setStroke()
+        let path = NSBezierPath()
+        path.lineWidth = 7
+        path.lineCapStyle = .round
+        path.lineJoinStyle = .round
+        path.move(to: NSPoint(x: 17, y: 25))
+        path.line(to: NSPoint(x: 29, y: 39))
+        path.line(to: NSPoint(x: 38, y: 30))
+        path.line(to: NSPoint(x: 49, y: 45))
+        path.move(to: NSPoint(x: 38, y: 45))
+        path.line(to: NSPoint(x: 49, y: 45))
+        path.line(to: NSPoint(x: 49, y: 34))
+        path.stroke()
+        image.unlockFocus()
+        image.isTemplate = false
+        return image
+    }()
 }

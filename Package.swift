@@ -25,7 +25,10 @@ let package = Package(
         .target(name: "AccessControlsCore"),
         .executableTarget(
             name: "AccessControlsApp",
-            dependencies: ["AccessControlsCore"]
+            dependencies: ["AccessControlsCore"],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .executableTarget(
             name: "AccessControlsCoreChecks",

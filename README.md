@@ -36,17 +36,6 @@ open build/AccessControls.app
 
 The app is packaged as a menu bar-only app using `LSUIElement`, so it does not show a Dock icon.
 
-## Release Bundle
-
-The repository includes a GitHub Actions release workflow that builds the app bundle, zips `AccessControls.app`, generates a SHA-256 checksum, and attaches both files to a GitHub Release.
-
-Run it manually from GitHub Actions with a tag such as `v1.0.0`, or publish by pushing a release tag:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
 ## License
 
 Access Controls is open source under the MIT License.
