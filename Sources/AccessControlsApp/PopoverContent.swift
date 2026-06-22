@@ -53,9 +53,7 @@ struct PopoverContent: View {
 
     private var header: some View {
         HStack(spacing: 9) {
-            Image(systemName: "bolt.horizontal.circle.fill")
-                .font(.system(size: 19, weight: .semibold))
-                .foregroundStyle(Color(hex: "#F0D38A"))
+            AccessBrandIcon(size: 22, showsShadow: true)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("Access Controls")

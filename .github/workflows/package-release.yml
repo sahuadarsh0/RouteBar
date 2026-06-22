@@ -1,0 +1,68 @@
+name: Package Publisher
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create, for example v1.0.0"
+        required: true
+        type: string
+      draft:
+        description: "Create the GitHub Release as a draft"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Build macOS release bundle
+    runs-on: macos-15
+
+    env:
+      APP_NAME: AccessControls
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Run core checks
+        run: swift run AccessControlsCoreChecks
+
+      - name: Build app bundle
+        run: Scripts/build-app.sh
+
+      - name: Create release archive
+        run: |
+          mkdir -p dist
+          ditto -c -k --keepParent "build/${APP_NAME}.app" "dist/${APP_NAME}-macOS.zip"
+          shasum -a 256 "dist/${APP_NAME}-macOS.zip" > "dist/${APP_NAME}-macOS.zip.sha256"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ env.RELEASE_TAG }}
+          path: |
+            dist/${{ env.APP_NAME }}-macOS.zip
+            dist/${{ env.APP_NAME }}-macOS.zip.sha256
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          name: Access Controls ${{ env.RELEASE_TAG }}
+          draft: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.draft == 'true' }}
+          generate_release_notes: true
+          files: |
+            dist/${{ env.APP_NAME }}-macOS.zip
+            dist/${{ env.APP_NAME }}-macOS.zip.sha256

@@ -13,6 +13,7 @@ rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 cp "$EXECUTABLE_PATH" "$APP_DIR/Contents/MacOS/$APP_NAME"
 cp "$ROOT_DIR/AppBundle/Info.plist" "$APP_DIR/Contents/Info.plist"
+cp "$ROOT_DIR/AppBundle/AccessControls.icns" "$APP_DIR/Contents/Resources/AccessControls.icns"
 
 plutil -lint "$APP_DIR/Contents/Info.plist"
 codesign --force --deep --sign - "$APP_DIR" >/dev/null

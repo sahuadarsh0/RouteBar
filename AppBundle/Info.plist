@@ -8,6 +8,8 @@
     <string>AccessControls</string>
     <key>CFBundleIdentifier</key>
     <string>com.local.AccessControls</string>
+    <key>CFBundleIconFile</key>
+    <string>AccessControls</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>

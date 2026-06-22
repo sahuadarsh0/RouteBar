@@ -3,13 +3,13 @@
 A native macOS menu bar app for one-click access to saved applications and URLs/deep links.
 
 <p align="center">
-  <img src="docs/images/hero-banner.svg" alt="Access Controls hero banner" width="100%">
+  <img src="docs/images/hero-banner.png" alt="Access Controls hero banner" width="100%">
 </p>
 
 ## Preview
 
 <p align="center">
-  <img src="docs/images/menu-preview.svg" alt="Access Controls menu preview with apps and links" width="620">
+  <img src="docs/images/menu-preview.png" alt="Access Controls menu preview with apps and links" width="620">
 </p>
 
 ## Features
@@ -35,6 +35,17 @@ open build/AccessControls.app
 ```
 
 The app is packaged as a menu bar-only app using `LSUIElement`, so it does not show a Dock icon.
+
+## Release Bundle
+
+The repository includes a GitHub Actions release workflow that builds the app bundle, zips `AccessControls.app`, generates a SHA-256 checksum, and attaches both files to a GitHub Release.
+
+Run it manually from GitHub Actions with a tag such as `v1.0.0`, or publish by pushing a release tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 ## License
 
