@@ -120,8 +120,7 @@ final class AccessControlsViewModel: ObservableObject {
 
     private func presentLinkEditor(draft: EditorDraft) {
         if let linkEditorWindow, linkEditorWindow.isVisible {
-            linkEditorWindow.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
+            bringUtilityWindowToFront(linkEditorWindow)
             return
         }
 
@@ -153,14 +152,12 @@ final class AccessControlsViewModel: ObservableObject {
         )
         linkEditorWindow = window
         positionUtilityWindow(window, size: size, topOffset: 64)
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        bringUtilityWindowToFront(window)
     }
 
     private func presentAppPicker() {
         if let appPickerWindow, appPickerWindow.isVisible {
-            appPickerWindow.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
+            bringUtilityWindowToFront(appPickerWindow)
             return
         }
 
@@ -184,13 +181,12 @@ final class AccessControlsViewModel: ObservableObject {
         )
         appPickerWindow = window
         positionUtilityWindow(window, size: size, topOffset: 64)
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        bringUtilityWindowToFront(window)
     }
 
     private func positionUtilityWindow(_ window: NSWindow, size: NSSize, topOffset: CGFloat) {
-        window.level = .floating
-        window.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary]
+        window.level = .statusBar
+        window.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .transient]
         window.isMovableByWindowBackground = true
         window.tabbingMode = .disallowed
 
@@ -212,6 +208,12 @@ final class AccessControlsViewModel: ObservableObject {
         )
 
         window.setFrame(NSRect(x: x, y: y, width: size.width, height: size.height), display: false)
+    }
+
+    private func bringUtilityWindowToFront(_ window: NSWindow) {
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
 
     private func screenForUtilityWindow() -> NSScreen? {

@@ -20,7 +20,8 @@ struct PopoverContent: View {
         }
 
         let sectionCount = (apps.isEmpty ? 0 : 1) + (links.isEmpty ? 0 : 1)
-        let rawHeight = CGFloat((apps.count + links.count) * 42 + sectionCount * 26 + 12)
+        let separatorCount = max(apps.count - 1, 0) + max(links.count - 1, 0)
+        let rawHeight = CGFloat((apps.count + links.count) * 42 + separatorCount + sectionCount * 26 + 12)
         return min(max(rawHeight, 84), 318)
     }
 
@@ -135,14 +136,20 @@ struct PopoverContent: View {
                 }
                 .padding(.horizontal, 4)
 
-                ForEach(items) { item in
-                    AccessItemRow(
-                        item: item,
-                        open: { model.open(item) },
-                        copy: item.kind == .link ? { model.copyTarget(item) } : nil,
-                        edit: item.kind == .link ? { model.edit(item) } : nil,
-                        delete: { deleteTarget = item }
-                    )
+                VStack(spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        AccessItemRow(
+                            item: item,
+                            open: { model.open(item) },
+                            copy: item.kind == .link ? { model.copyTarget(item) } : nil,
+                            edit: item.kind == .link ? { model.edit(item) } : nil,
+                            delete: { deleteTarget = item }
+                        )
+
+                        if index < items.count - 1 {
+                            ShortcutSeparator()
+                        }
+                    }
                 }
             }
         }
@@ -287,6 +294,7 @@ private struct AccessItemRow: View {
         }
         .padding(.horizontal, 7)
         .padding(.vertical, 5)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             ZStack(alignment: .leading) {
                 if isHovering {
@@ -294,12 +302,6 @@ private struct AccessItemRow: View {
                         .fill(.white.opacity(0.085))
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(.white.opacity(0.11), lineWidth: 1)
-                }
-                if item.kind == .link {
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(Color(hex: item.colorHex))
-                        .frame(width: 3)
-                        .padding(.vertical, 9)
                 }
             }
         )
@@ -321,7 +323,7 @@ private struct AccessItemRow: View {
     private var iconTile: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(tileColor.opacity(item.kind == .app ? 0.20 : 0.16))
+                .fill(tileColor.opacity(item.kind == .app ? 0.20 : 0.26))
 
             if let appIcon {
                 Image(nsImage: appIcon)
@@ -349,6 +351,16 @@ private struct AccessItemRow: View {
             return nil
         }
         return NSWorkspace.shared.icon(forFile: appPath)
+    }
+}
+
+private struct ShortcutSeparator: View {
+    var body: some View {
+        Rectangle()
+            .fill(.white.opacity(0.055))
+            .frame(height: 1)
+            .padding(.leading, 44)
+            .padding(.trailing, 4)
     }
 }
 
